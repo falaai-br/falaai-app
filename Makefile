@@ -6,6 +6,9 @@ GITLEAKS_VERSION    ?= 8.28.0
 OSV ?= osv-scanner
 # Aparelho para make test-device (id de 'flutter devices'). Vazio: o flutter escolhe.
 DEVICE ?=
+# Nos hooks o git exporta GIT_DIR; o flutter roda git no próprio SDK, lê este repositório
+# e se vê como versão 0.0.0-unknown. Os comandos acham o repositório pelo diretório.
+unexport GIT_DIR GIT_WORK_TREE
 
 .PHONY: tools fmt lint test test-integration test-device security build check check-fast
 tools: hooks ## Dependências, ferramentas pinadas e hooks

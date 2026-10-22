@@ -94,6 +94,32 @@ void main() {
       }
     });
   }
+
+  // Regressão: no pre-push o GIT_DIR exportado pelo git chegava ao flutter, que se via
+  // como versão 0.0.0-unknown e falhava no pub get.
+  test('make não repassa GIT_DIR dos hooks aos comandos', () {
+    final dir = Directory.systemTemp.createTempSync('falaai-makefile-');
+    addTearDown(() => dir.deleteSync(recursive: true));
+    // GNU Make 3.81 (macOS) não tem --eval: um makefile auxiliar inclui o do repositório.
+    final probe = File('${dir.path}/probe.mk')
+      ..writeAsStringSync(
+        'include Makefile\n'
+        r'_git_env: ; @echo "dir=$$GIT_DIR tree=$$GIT_WORK_TREE"'
+        '\n',
+      );
+    final env = _isolatedEnv()
+      ..['GIT_DIR'] = '/outro/repo/.git'
+      ..['GIT_WORK_TREE'] = '/outro/repo';
+    final result = Process.runSync(
+      'make',
+      ['-s', '-f', probe.path, '_git_env'],
+      environment: env,
+      includeParentEnvironment: false,
+    );
+
+    expect(result.exitCode, 0, reason: '${result.stdout}${result.stderr}');
+    expect((result.stdout as String).trim(), 'dir= tree=');
+  });
 }
 
 void _git(String dir, List<String> args) {
