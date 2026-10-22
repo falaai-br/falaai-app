@@ -11,3 +11,4 @@ O pipeline de qualidade roda **localmente**, nos hooks versionados aqui. Não h�
 - Ativação: `make tools` (ou `make hooks`) configura `core.hooksPath=.githooks` neste clone.
 - Todos são **bloqueantes**. Emergência: `FALAAI_SKIP_HOOKS=1`. O Refinery do Gas Town roda `make check` de novo antes do merge, então pular o hook não pula o gate.
 - Agentes: procurem `FALAAI-HOOK: FAIL gate=<nome>` no stderr.
+- O comportamento dos hooks é testado em `test_integration/githooks_test.dart` (roda no `make test-integration`): mudou um hook, rode `flutter test test_integration`.
