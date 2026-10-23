@@ -1,0 +1,8 @@
+# Textos do app em ARB (pt-BR é o idioma único no MVP). O código gerado em lib/l10n é
+# versionado e regenerado pelo flutter (pub get, build, test).
+arb-dir: lib/l10n
+template-arb-file: app_pt.arb
+output-localization-file: app_localizations.dart
+output-class: AppLocalizations
+nullable-getter: false
+format: true

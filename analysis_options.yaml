@@ -12,6 +12,7 @@ analyzer:
     - "lib/src/rust/**"
     - "**/*.g.dart"
     - "**/*.freezed.dart"
+    - "lib/l10n/app_localizations*.dart"
 
 linter:
   rules:

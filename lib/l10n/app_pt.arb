@@ -1,0 +1,19 @@
+{
+  "@@locale": "pt",
+  "appTitle": "FalaAí",
+  "@appTitle": {
+    "description": "Nome do app, na barra do topo e no seletor de apps."
+  },
+  "coreStarting": "Preparando suas conversas…",
+  "@coreStarting": {
+    "description": "Enquanto o banco local cifrado é aberto, logo ao abrir o app."
+  },
+  "coreFailed": "Não foi possível abrir suas conversas neste aparelho.",
+  "@coreFailed": {
+    "description": "O banco local cifrado não abriu."
+  },
+  "homeEmpty": "Nenhuma conversa ainda.",
+  "@homeEmpty": {
+    "description": "Lista de conversas vazia."
+  }
+}

@@ -4,12 +4,31 @@ App do **FalaAí** para Android e iOS, em Flutter. Mensagens, grupos, mídia e c
 
 ## Desenvolvimento
 
-Pré-requisitos: Flutter estável (Dart 3.9+), Android SDK, Xcode (para iOS) e Go (instala o osv-scanner e o gitleaks).
+Pré-requisitos: Flutter estável (Dart 3.9+), Android SDK com o NDK, [rustup](https://rustup.rs), Xcode (para iOS) e Go (instala o osv-scanner e o gitleaks).
 
 ```sh
-make tools   # dependências, ferramentas pinadas e git hooks (core.hooksPath=.githooks)
+make tools   # dependências, targets Rust do Android, cargo-ndk, ferramentas pinadas e git hooks
 make help    # lista os alvos
 ```
+
+### Estrutura
+
+| Caminho | O que tem |
+|---|---|
+| `lib/state/` | Async Redux: `AppState`, actions e as dependências injetadas na store |
+| `lib/core/` | Abertura do falaai-core e a chave do banco (Keychain/Keystore) |
+| `lib/router.dart` | Rotas (`go_router`) |
+| `lib/l10n/` | Textos em ARB (pt-BR); o código gerado é versionado |
+| `lib/ui/` | Telas |
+| `tool/build_core.dart` | Build Android do falaai-core, chamado pelo Gradle |
+
+### falaai-core
+
+O núcleo em Rust vem do pacote `falaai_core`, dependência git pinada por commit no `pubspec.yaml`: os bindings Dart ficam em `dart/` e a crate na raiz do mesmo repositório. Para atualizar o core, troque o `ref` e rode `flutter pub get`.
+
+No Android, todo build do Gradle (`flutter run`, `make build`) roda `tool/build_core.dart` antes: o cargo-ndk compila a crate em release para as ABIs do build e as `.so` entram como `jniLibs`. O primeiro build leva uns 10 minutos (libsignal e SQLCipher); depois o cargo reaproveita `build/falaai_core/target`. Native Assets (ADR-0003) ainda não está disponível no Flutter estável 3.35.
+
+A chave do SQLCipher (256 bits) é gerada no primeiro uso e guardada no Keychain (`first_unlock_this_device`) ou no Keystore. O backup do Android fica desligado: a chave não sai do aparelho e um banco restaurado em outro não abriria.
 
 Não há CI remoto (ADR-0009): o pipeline roda nos git hooks e no Refinery do Gas Town.
 
