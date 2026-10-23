@@ -21,8 +21,11 @@ void main() {
   setUp(() async => dataDir = await Directory.systemTemp.createTemp('falaai'));
   tearDown(() => dataDir.delete(recursive: true));
 
-  Future<FalaaiCore> open(MemorySecretStore secrets) =>
-      openFalaaiCore(secrets: secrets, dataDir: () async => dataDir);
+  Future<FalaaiCore> open(MemorySecretStore secrets) => openFalaaiCore(
+    secrets: secrets,
+    dataDir: () async => dataDir,
+    trustRoot: testTrustRoot,
+  );
 
   testWidgets('o app abre o core nativo e mostra a lista vazia', (
     tester,
@@ -51,6 +54,17 @@ void main() {
     await expectLater(
       (await open(secrets)).generateAccountKeys(),
       throwsA(CoreError.accountExists),
+    );
+  });
+
+  testWidgets('o core nativo recusa trust root malformado', (tester) async {
+    await expectLater(
+      openFalaaiCore(
+        secrets: MemorySecretStore(),
+        dataDir: () async => dataDir,
+        trustRoot: testTrustRoot.sublist(0, 10),
+      ),
+      throwsA(CoreError.invalidKey),
     );
   });
 }

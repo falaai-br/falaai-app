@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'app.dart';
+import 'config/build_config.dart';
 import 'core/database_key.dart';
 import 'core/open_core.dart';
 import 'state/actions.dart';
@@ -16,9 +17,12 @@ void main() {
 }
 
 Future<FalaaiCore> _openCore() async {
+  // Antes da ponte: sem trust root na build, o core não abre.
+  final config = BuildConfig.fromEnvironment();
   await FalaaiCoreLib.init();
   return openFalaaiCore(
     secrets: DeviceSecretStore(),
     dataDir: getApplicationSupportDirectory,
+    trustRoot: config.trustRoot,
   );
 }

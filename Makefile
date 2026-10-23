@@ -9,6 +9,9 @@ GITLEAKS_VERSION    ?= 8.28.0
 OSV ?= osv-scanner
 # Aparelho para make test-device (id de 'flutter devices'). Vazio: o flutter escolhe.
 DEVICE ?=
+# Ambiente embutido na build: config/$(FALAAI_ENV).json (trust root do sealed sender etc.).
+FALAAI_ENV ?= dev
+DART_DEFINES := --dart-define-from-file=config/$(FALAAI_ENV).json
 # Nos hooks o git exporta GIT_DIR; o flutter roda git no próprio SDK, lê este repositório
 # e se vê como versão 0.0.0-unknown. Os comandos acham o repositório pelo diretório.
 unexport GIT_DIR GIT_WORK_TREE
@@ -40,14 +43,14 @@ test-integration: ## Testes de integração que não exigem aparelho (hooks, red
 	flutter test test_integration
 
 test-device: ## integration_test em aparelho/emulador conectado (DEVICE=<id>). Fora do hook
-	flutter test integration_test $(if $(DEVICE),-d $(DEVICE))
+	flutter test integration_test $(DART_DEFINES) $(if $(DEVICE),-d $(DEVICE))
 
 security: ## osv-scanner no pubspec.lock e gitleaks
 	$(OSV) scan source --lockfile=pubspec.lock
 	$(GITLEAKS) git --no-banner --redact .
 
 build: ## Build Android de verificação (compila o falaai-core com o cargo-ndk pelo Gradle)
-	flutter build apk --debug --target-platform android-arm64
+	flutter build apk --debug --target-platform android-arm64 $(DART_DEFINES)
 
 check-fast: ## pre-commit
 	dart format --output=none --set-exit-if-changed .

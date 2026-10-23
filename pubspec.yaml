@@ -19,7 +19,7 @@ dependencies:
   falaai_core:
     git:
       url: https://github.com/falaai-br/falaai-core.git
-      ref: 3e3503adde026b4989e8ecb59fc2fc716b9bd6e4
+      ref: 6ea44dfc04519dd95f10d4505f3ac415a3c0d19f
       path: dart
 
 dev_dependencies:

@@ -16,7 +16,9 @@ make help    # lista os alvos
 | Caminho | O que tem |
 |---|---|
 | `lib/state/` | Async Redux: `AppState`, actions e as dependências injetadas na store |
-| `lib/core/` | Abertura do falaai-core e a chave do banco (Keychain/Keystore) |
+| `lib/core/` | Abertura do falaai-core, a chave do banco e o certificado de remetente (Keychain/Keystore) |
+| `lib/config/` | Configuração do ambiente embutida na build |
+| `config/` | Um JSON por ambiente, lido por `--dart-define-from-file` |
 | `lib/router.dart` | Rotas (`go_router`) |
 | `lib/l10n/` | Textos em ARB (pt-BR); o código gerado é versionado |
 | `lib/ui/` | Telas |
@@ -29,6 +31,19 @@ O núcleo em Rust vem do pacote `falaai_core`, dependência git pinada por commi
 No Android, todo build do Gradle (`flutter run`, `make build`) roda `tool/build_core.dart` antes: o cargo-ndk compila a crate em release para as ABIs do build e as `.so` entram como `jniLibs`. O primeiro build leva uns 10 minutos (libsignal e SQLCipher); depois o cargo reaproveita `build/falaai_core/target`. Native Assets (ADR-0003) ainda não está disponível no Flutter estável 3.35.
 
 A chave do SQLCipher (256 bits) é gerada no primeiro uso e guardada no Keychain (`first_unlock_this_device`) ou no Keystore. O backup do Android fica desligado: a chave não sai do aparelho e um banco restaurado em outro não abriria.
+
+### Ambientes e sealed sender
+
+Cada ambiente tem um `config/<ambiente>.json`, embutido na build com `--dart-define-from-file`. O Makefile usa `FALAAI_ENV` (padrão `dev`); com `flutter run`, passe o arquivo à mão:
+
+```sh
+flutter run --dart-define-from-file=config/dev.json
+make build FALAAI_ENV=dev
+```
+
+`FALAAI_TRUST_ROOT` é a chave pública raiz do servidor (33 bytes em base64), publicada pelo `accounts` (ADR-0010). O app nunca a baixa em tempo de execução: trocar de trust root é trocar de build. Sem ela, ou malformada, o core não abre.
+
+O certificado de remetente (24h) fica no Keychain/Keystore e volta ao core a cada abertura; quando o core diz que falta ou venceu, o app pede outro ao `accounts` e cifra de novo (`lib/core/sender_certificate.dart`).
 
 Não há CI remoto (ADR-0009): o pipeline roda nos git hooks e no Refinery do Gas Town.
 
