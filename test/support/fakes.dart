@@ -43,5 +43,20 @@ class MemorySecretStore implements SecretStore {
   Future<void> write(String name, String value) async => values[name] = value;
 }
 
+/// Gerador de chave do banco no lugar do `generateDbKey` do core: cada chamada devolve uma
+/// chave diferente da anterior, ou a de [next] se programada.
+class FakeKeyGenerator {
+  var calls = 0;
+  Uint8List? next;
+
+  Future<Uint8List> call() async {
+    calls++;
+    final programmed = next;
+    if (programmed != null) return programmed;
+    return Uint8List(DatabaseKey.length)
+      ..fillRange(0, DatabaseKey.length, calls);
+  }
+}
+
 /// Trust root de teste: chave pública Curve25519 da libsignal (tipo 0x05 e 32 bytes).
 final testTrustRoot = Uint8List.fromList([0x05, ...List.filled(32, 0x42)]);

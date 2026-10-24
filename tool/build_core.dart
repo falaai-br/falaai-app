@@ -52,6 +52,23 @@ Directory crateDirFrom(String packageConfig, Uri configUri) {
   return Directory.fromUri(root.resolve('..'));
 }
 
+/// Ambiente do `cargo ndk`. O protoc pinado vai em `PROTOC`, que o prost-build lê, e na frente
+/// do [path] herdado, porque o protobuf-codegen do zkgroup só procura no `PATH`.
+Map<String, String> cargoEnvironment({
+  required String ndk,
+  required String out,
+  required String protocDir,
+  required String? path,
+}) => {
+  'ANDROID_NDK_HOME': ndk,
+  'CARGO_TARGET_DIR': '$out/target',
+  'PROTOC': '$protocDir/bin/protoc',
+  'PATH': [
+    '$protocDir/bin',
+    if (path != null && path.isNotEmpty) path,
+  ].join(':'),
+};
+
 String _asDirectory(String uri) => uri.endsWith('/') ? uri : '$uri/';
 
 Future<void> main(List<String> args) async {
@@ -96,11 +113,12 @@ Future<void> main(List<String> args) async {
       '--locked',
     ],
     crate.path,
-    environment: {
-      'ANDROID_NDK_HOME': options.require('ndk'),
-      'CARGO_TARGET_DIR': '${out.path}/target',
-      'PROTOC': '$protocDir/bin/protoc',
-    },
+    environment: cargoEnvironment(
+      ndk: options.require('ndk'),
+      out: out.path,
+      protocDir: protocDir,
+      path: Platform.environment['PATH'],
+    ),
   );
 }
 

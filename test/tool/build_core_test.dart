@@ -61,4 +61,28 @@ void main() {
       expect(() => crateDirFrom(config([]), configUri), throwsStateError);
     });
   });
+
+  group('cargoEnvironment', () {
+    Map<String, String> environment(String? path) => cargoEnvironment(
+      ndk: '/ndk',
+      out: '/out',
+      protocDir: '/out/protoc',
+      path: path,
+    );
+
+    test('protoc pinado em PROTOC e na frente do PATH herdado', () {
+      expect(environment('/usr/bin:/bin'), {
+        'ANDROID_NDK_HOME': '/ndk',
+        'CARGO_TARGET_DIR': '/out/target',
+        'PROTOC': '/out/protoc/bin/protoc',
+        'PATH': '/out/protoc/bin:/usr/bin:/bin',
+      });
+    });
+
+    for (final path in [null, '']) {
+      test('sem PATH herdado (${path ?? 'null'}) só o protoc', () {
+        expect(environment(path)['PATH'], '/out/protoc/bin');
+      });
+    }
+  });
 }

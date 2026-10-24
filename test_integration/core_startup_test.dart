@@ -2,6 +2,7 @@
 // ignore_for_file: implementation_imports
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:falaai_app/core/database_key.dart';
 import 'package:falaai_app/core/open_core.dart';
@@ -12,10 +13,14 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../test/support/fakes.dart';
 
-/// API da ponte que registra as aberturas em vez de chamar o Rust.
+/// API da ponte que registra as aberturas e as chaves geradas em vez de chamar o Rust.
 class RecordingApi extends Fake implements FalaaiCoreLibApi {
   final opened = <({String dbPath, List<int> dbKey, List<int> trustRoot})>[];
   var core = RecordingCore();
+  var keys = FakeKeyGenerator();
+
+  @override
+  Future<Uint8List> crateApiGenerateDbKey() => keys();
 
   @override
   Future<FalaaiCore> crateApiFalaaiCoreOpen({
@@ -40,6 +45,7 @@ void main() {
   setUp(() {
     api.opened.clear();
     api.core = RecordingCore();
+    api.keys = FakeKeyGenerator();
   });
 
   Future<FalaaiCore> open(MemorySecretStore secrets) => openFalaaiCore(
@@ -54,6 +60,7 @@ void main() {
     await open(secrets);
     await open(secrets);
 
+    expect(api.keys.calls, 1, reason: 'a chave nasce no core, uma vez');
     expect(api.opened, hasLength(2));
     final stored = await DatabaseKey(secrets).loadOrCreate();
     for (final open in api.opened) {
@@ -90,6 +97,7 @@ void main() {
       ..values[DatabaseKey.storageName] = 'AAAA';
 
     await expectLater(open(secrets), throwsFormatException);
+    expect(api.keys.calls, 0);
     expect(api.opened, isEmpty);
   });
 }

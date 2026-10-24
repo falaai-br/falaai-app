@@ -1,7 +1,7 @@
 import 'dart:convert';
-import 'dart:math';
 import 'dart:typed_data';
 
+import 'package:falaai_core/falaai_core.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 /// Onde a chave do banco fica guardada: Keychain no iOS, Keystore no Android.
@@ -33,17 +33,19 @@ class DeviceSecretStore implements SecretStore {
       _storage.write(key: name, value: value);
 }
 
-/// Chave de 256 bits do SQLCipher do falaai-core. Gerada no primeiro uso e guardada em
-/// [SecretStore]; o Dart só a repassa ao core ao abrir o banco.
+/// Chave de 256 bits do SQLCipher do falaai-core. Gerada pelo core no primeiro uso e guardada
+/// em [SecretStore]; o Dart só a guarda e repassa ao core ao abrir o banco.
 class DatabaseKey {
-  DatabaseKey(this._store, {Random? random})
-    : _random = random ?? Random.secure();
+  /// [generate] é o gerador do core ([generateDbKey]), que exige a ponte inicializada; os
+  /// testes sem biblioteca nativa injetam outro.
+  DatabaseKey(this._store, {Future<Uint8List> Function()? generate})
+    : _generate = generate ?? generateDbKey;
 
   static const storageName = 'falaai.database_key';
   static const length = 32;
 
   final SecretStore _store;
-  final Random _random;
+  final Future<Uint8List> Function() _generate;
 
   /// A chave guardada ou, no primeiro uso, uma nova. Uma chave guardada inválida é erro, não
   /// motivo para gerar outra: o banco cifrado com ela ficaria inacessível.
@@ -56,9 +58,9 @@ class DatabaseKey {
       }
       return key;
     }
-    final key = Uint8List(length);
-    for (var i = 0; i < length; i++) {
-      key[i] = _random.nextInt(256);
+    final key = await _generate();
+    if (key.length != length) {
+      throw const FormatException('chave gerada com tamanho inválido');
     }
     await _store.write(storageName, base64Encode(key));
     return key;
