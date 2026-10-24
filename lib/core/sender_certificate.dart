@@ -10,6 +10,18 @@ abstract interface class SenderCertificateSource {
   Future<Uint8List> fetch();
 }
 
+/// [SenderCertificateSource] pelo HTTPS do core (`GET /v1/certificate/sender` do `accounts`),
+/// com o token do dispositivo. Exige o core conectado ([FalaaiCore.connect]); o Dart não abre
+/// conexão com o servidor.
+class CoreSenderCertificateSource implements SenderCertificateSource {
+  const CoreSenderCertificateSource(this._core);
+
+  final FalaaiCore _core;
+
+  @override
+  Future<Uint8List> fetch() => _core.fetchSenderCertificate();
+}
+
 /// Certificado de remetente do sealed sender. O core só o guarda em memória; aqui ele fica em
 /// [SecretStore] (leva o ACI e a identidade do dispositivo), volta ao core a cada abertura e é
 /// trocado quando o core o recusa.

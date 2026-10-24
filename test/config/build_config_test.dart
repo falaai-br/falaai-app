@@ -7,32 +7,53 @@ import 'package:flutter_test/flutter_test.dart';
 import '../support/fakes.dart';
 
 void main() {
-  test('lê o ambiente e o trust root em base64', () {
-    final config = BuildConfig.parse(
-      environment: 'dev',
-      trustRoot: base64Encode(testTrustRoot),
-    );
+  const gateway = 'wss://gw.falaai.test';
+  const accounts = 'https://accounts.falaai.test';
+  final root = base64Encode(testTrustRoot);
+
+  BuildConfig parse({
+    String environment = 'dev',
+    String? trustRoot,
+    String gatewayUrl = gateway,
+    String accountsUrl = accounts,
+  }) => BuildConfig.parse(
+    environment: environment,
+    trustRoot: trustRoot ?? root,
+    gatewayUrl: gatewayUrl,
+    accountsUrl: accountsUrl,
+  );
+
+  test('lê o ambiente, o trust root em base64 e o servidor', () {
+    final config = parse();
 
     expect(config.environment, 'dev');
     expect(config.trustRoot, testTrustRoot);
+    expect(config.gatewayUrl, gateway);
+    expect(config.accountsUrl, accounts);
   });
 
-  final invalid = {
-    'ambiente ausente': (env: '', root: base64Encode(testTrustRoot)),
-    'trust root ausente': (env: 'dev', root: ''),
-    'trust root fora de base64': (env: 'dev', root: 'não é base64'),
-    'trust root curto': (
-      env: 'dev',
-      root: base64Encode(testTrustRoot.sublist(1)),
-    ),
-    'trust root longo': (env: 'dev', root: base64Encode([...testTrustRoot, 0])),
+  test('o servidor do core usa as URLs da build e as raízes da Mozilla', () {
+    final server = parse().server;
+
+    expect(server.gatewayUrl, gateway);
+    expect(server.accountsUrl, accounts);
+    expect(server.rootCertificates, isEmpty);
+  });
+
+  final invalid = <String, BuildConfig Function()>{
+    'ambiente ausente': () => parse(environment: ''),
+    'trust root ausente': () => parse(trustRoot: ''),
+    'trust root fora de base64': () => parse(trustRoot: 'não é base64'),
+    'trust root curto': () =>
+        parse(trustRoot: base64Encode(testTrustRoot.sublist(1))),
+    'trust root longo': () =>
+        parse(trustRoot: base64Encode([...testTrustRoot, 0])),
+    'gateway ausente': () => parse(gatewayUrl: ''),
+    'accounts ausente': () => parse(accountsUrl: ''),
   };
-  for (final MapEntry(key: name, value: input) in invalid.entries) {
+  for (final MapEntry(key: name, value: build) in invalid.entries) {
     test('recusa build com $name', () {
-      expect(
-        () => BuildConfig.parse(environment: input.env, trustRoot: input.root),
-        throwsFormatException,
-      );
+      expect(build, throwsFormatException);
     });
   }
 
@@ -44,7 +65,35 @@ void main() {
     final file = File('config/dev.json').readAsStringSync();
     final values = jsonDecode(file) as Map<String, Object?>;
 
-    expect(values.keys, containsAll(['FALAAI_ENV', 'FALAAI_TRUST_ROOT']));
+    expect(
+      values.keys,
+      containsAll([
+        'FALAAI_ENV',
+        'FALAAI_TRUST_ROOT',
+        'FALAAI_GATEWAY_URL',
+        'FALAAI_ACCOUNTS_URL',
+      ]),
+    );
     expect(values['FALAAI_ENV'], 'dev');
+  });
+
+  test('em dev o servidor é o compose local, no loopback', () {
+    final file = File('config/dev.json').readAsStringSync();
+    final values = jsonDecode(file) as Map<String, Object?>;
+
+    for (final key in ['FALAAI_GATEWAY_URL', 'FALAAI_ACCOUNTS_URL']) {
+      expect(Uri.parse(values[key]! as String).host, '127.0.0.1', reason: key);
+    }
+  });
+
+  test('o trust root de dev não entra no git: cada máquina gera o seu', () {
+    final file = File('config/dev.json').readAsStringSync();
+    final values = jsonDecode(file) as Map<String, Object?>;
+
+    expect(values['FALAAI_TRUST_ROOT'], isEmpty);
+    expect(
+      File('.gitignore').readAsLinesSync(),
+      contains('config/*.local.json'),
+    );
   });
 }

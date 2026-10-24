@@ -18,3 +18,6 @@ GoogleService-Info.plist
 coverage/
 .ignore
 graft/
+
+# Trust root de dev desta máquina (make dev-trust-root).
+config/*.local.json

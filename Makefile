@@ -9,14 +9,20 @@ GITLEAKS_VERSION    ?= 8.28.0
 OSV ?= osv-scanner
 # Aparelho para make test-device (id de 'flutter devices'). Vazio: o flutter escolhe.
 DEVICE ?=
-# Ambiente embutido na build: config/$(FALAAI_ENV).json (trust root do sealed sender etc.).
+# Ambiente embutido na build: config/$(FALAAI_ENV).json (trust root do sealed sender, servidor).
+# O config/$(FALAAI_ENV).local.json, fora do git, vem depois e vence: em dev leva o trust root do
+# signer desta máquina (make dev-trust-root).
 FALAAI_ENV ?= dev
-DART_DEFINES := --dart-define-from-file=config/$(FALAAI_ENV).json
+LOCAL_CONFIG := config/$(FALAAI_ENV).local.json
+DART_DEFINES := --dart-define-from-file=config/$(FALAAI_ENV).json \
+	$(if $(wildcard $(LOCAL_CONFIG)),--dart-define-from-file=$(LOCAL_CONFIG))
+# Checkout do falaai-server com o compose de dev (make dev-trust-root).
+FALAAI_SERVER_DIR ?= ../falaai-server
 # Nos hooks o git exporta GIT_DIR; o flutter roda git no próprio SDK, lê este repositório
 # e se vê como versão 0.0.0-unknown. Os comandos acham o repositório pelo diretório.
 unexport GIT_DIR GIT_WORK_TREE
 
-.PHONY: tools fmt lint test test-integration test-device security build check check-fast
+.PHONY: tools fmt lint test test-integration test-device security build check check-fast dev-trust-root
 tools: hooks ## Dependências, ferramentas pinadas e hooks
 	flutter --version
 	flutter precache --android --ios
@@ -51,6 +57,9 @@ security: ## osv-scanner no pubspec.lock e gitleaks
 
 build: ## Build Android de verificação (compila o falaai-core com o cargo-ndk pelo Gradle)
 	flutter build apk --debug --target-platform android-arm64 $(DART_DEFINES)
+
+dev-trust-root: ## Grava em config/dev.local.json o trust root do falaai-server local (make dev-up-signer lá)
+	dart tool/dev_trust_root.dart --server-dir $(FALAAI_SERVER_DIR) --out config/dev.local.json
 
 check-fast: ## pre-commit
 	dart format --output=none --set-exit-if-changed .

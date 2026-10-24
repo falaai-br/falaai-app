@@ -16,13 +16,14 @@ make help    # lista os alvos
 | Caminho | O que tem |
 |---|---|
 | `lib/state/` | Async Redux: `AppState`, actions e as dependências injetadas na store |
-| `lib/core/` | Abertura do falaai-core, a chave do banco e o certificado de remetente (Keychain/Keystore) |
+| `lib/core/` | Abertura do falaai-core, a chave do banco, o certificado de remetente (Keychain/Keystore) e o envio/recebimento pelo transporte do core |
 | `lib/config/` | Configuração do ambiente embutida na build |
 | `config/` | Um JSON por ambiente, lido por `--dart-define-from-file` |
 | `lib/router.dart` | Rotas (`go_router`) |
 | `lib/l10n/` | Textos em ARB (pt-BR); o código gerado é versionado |
 | `lib/ui/` | Telas |
 | `tool/build_core.dart` | Build Android do falaai-core, chamado pelo Gradle |
+| `tool/dev_trust_root.dart` | Trust root do signer de dev desta máquina (`make dev-trust-root`) |
 
 ### falaai-core
 
@@ -41,9 +42,19 @@ flutter run --dart-define-from-file=config/dev.json
 make build FALAAI_ENV=dev
 ```
 
-`FALAAI_TRUST_ROOT` é a chave pública raiz do servidor (33 bytes em base64), publicada pelo `accounts` (ADR-0010). O app nunca a baixa em tempo de execução: trocar de trust root é trocar de build. Sem ela, ou malformada, o core não abre.
+`FALAAI_TRUST_ROOT` é a chave pública raiz do servidor (33 bytes em base64), publicada pelo `accounts` (ADR-0010). O app nunca a baixa em tempo de execução: trocar de trust root é trocar de build. Sem ela, ou malformada, o core não abre. `FALAAI_GATEWAY_URL` e `FALAAI_ACCOUNTS_URL` são as bases do servidor, sem caminho; o core só aceita `ws://` e `http://` no loopback.
 
-O certificado de remetente (24h) fica no Keychain/Keystore e volta ao core a cada abertura; quando o core diz que falta ou venceu, o app pede outro ao `accounts` e cifra de novo (`lib/core/sender_certificate.dart`).
+Em dev o trust root não é versionado: o `make dev-up-signer` do [falaai-server](https://github.com/falaai-br/falaai-server) gera chaves por máquina. Com o servidor no ar, `make dev-trust-root` (lê o checkout em `FALAAI_SERVER_DIR`, padrão `../falaai-server`) grava o trust root em `config/dev.local.json`, fora do git; o Makefile passa esse arquivo depois do `dev.json` e o valor dele vence. Com `flutter run`, passe os dois:
+
+```sh
+make dev-trust-root
+flutter run --dart-define-from-file=config/dev.json --dart-define-from-file=config/dev.local.json
+adb reverse tcp:8080 tcp:8080   # Android: o 127.0.0.1 do aparelho chega ao servidor da máquina
+```
+
+O certificado de remetente (24h) fica no Keychain/Keystore e volta ao core a cada abertura; quando o core diz que falta ou venceu, o app pede outro ao `accounts` pelo core e cifra de novo (`lib/core/sender_certificate.dart`).
+
+Envio e recebimento passam pelo transporte do core (`lib/core/messenger.dart`); o Dart não abre socket nem HTTPS. Depois do registro, `Messenger.onRegistered` conecta com o token do dispositivo e pede o primeiro certificado. `seal` cifra e sela; `deliver` envia, e reenviar o mesmo resultado deixa o destinatário deduplicar. O core vai pelo socket não autenticado com a unidentified access key quando tem a profile key do contato e cai para o autenticado sem ela. O que chega sai decifrado em `incoming`.
 
 Não há CI remoto (ADR-0009): o pipeline roda nos git hooks e no Refinery do Gas Town.
 
