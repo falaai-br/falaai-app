@@ -303,6 +303,168 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Aguarde…'**
   String get waiting;
+
+  /// Botão na lista de conversas e título do diálogo.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nova conversa'**
+  String get chatNew;
+
+  /// Explicação no diálogo de nova conversa.
+  ///
+  /// In pt, this message translates to:
+  /// **'Digite o ID da conta da pessoa. Convite por link, QR e nome de usuário vêm em breve.'**
+  String get chatNewMessage;
+
+  /// Campo do diálogo de nova conversa.
+  ///
+  /// In pt, this message translates to:
+  /// **'ID da conta'**
+  String get chatNewLabel;
+
+  /// O texto digitado não é um UUID.
+  ///
+  /// In pt, this message translates to:
+  /// **'Isso não é um ID de conta.'**
+  String get chatNewInvalid;
+
+  /// Confirma o diálogo de nova conversa.
+  ///
+  /// In pt, this message translates to:
+  /// **'Conversar'**
+  String get chatNewOpen;
+
+  /// Fecha um diálogo sem fazer nada.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cancelar'**
+  String get cancel;
+
+  /// Nome de um contato sem perfil ainda; {id} é o começo do ID da conta.
+  ///
+  /// In pt, this message translates to:
+  /// **'Contato {id}'**
+  String chatContact(String id);
+
+  /// Quem mandou, nas mensagens enviadas (leitor de tela).
+  ///
+  /// In pt, this message translates to:
+  /// **'Você'**
+  String get chatYou;
+
+  /// Prévia na lista quando a última mensagem é sua.
+  ///
+  /// In pt, this message translates to:
+  /// **'Você: {text}'**
+  String chatPreviewOutgoing(String text);
+
+  /// Na lista de conversas, no lugar da prévia, enquanto o contato digita.
+  ///
+  /// In pt, this message translates to:
+  /// **'digitando…'**
+  String get chatTyping;
+
+  /// Indicador na tela de chat.
+  ///
+  /// In pt, this message translates to:
+  /// **'{name} está digitando…'**
+  String chatTypingName(String name);
+
+  /// Leitor de tela para o contador de não lidas.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, one{{count} mensagem não lida} other{{count} mensagens não lidas}}'**
+  String chatUnread(int count);
+
+  /// Tela de chat sem mensagens.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhuma mensagem ainda. Só você e quem recebe podem ler.'**
+  String get chatEmpty;
+
+  /// Ao rolar até o início da janela de mensagens.
+  ///
+  /// In pt, this message translates to:
+  /// **'Carregando mensagens anteriores…'**
+  String get chatLoadingOlder;
+
+  /// Campo de texto da tela de chat.
+  ///
+  /// In pt, this message translates to:
+  /// **'Mensagem'**
+  String get chatComposerHint;
+
+  /// Botão de enviar.
+  ///
+  /// In pt, this message translates to:
+  /// **'Enviar'**
+  String get chatSend;
+
+  /// Recibo: na fila, ainda não chegou ao servidor.
+  ///
+  /// In pt, this message translates to:
+  /// **'Enviando'**
+  String get chatStatusPending;
+
+  /// Recibo: o servidor gravou na fila do destinatário.
+  ///
+  /// In pt, this message translates to:
+  /// **'Enviada'**
+  String get chatStatusSent;
+
+  /// Recibo: o aparelho do contato recebeu.
+  ///
+  /// In pt, this message translates to:
+  /// **'Entregue'**
+  String get chatStatusDelivered;
+
+  /// Recibo: o contato leu.
+  ///
+  /// In pt, this message translates to:
+  /// **'Lida'**
+  String get chatStatusRead;
+
+  /// Recibo: o envio falhou de vez.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi enviada'**
+  String get chatStatusFailed;
+
+  /// Falha de envio: sem sessão com o contato.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ainda não há uma conversa segura com esta pessoa.'**
+  String get chatFailedNoSession;
+
+  /// Falha de envio: identidade do contato não confiável.
+  ///
+  /// In pt, this message translates to:
+  /// **'O código de segurança mudou. Confira antes de enviar.'**
+  String get chatFailedIdentity;
+
+  /// Falha de envio: destinatário inexistente.
+  ///
+  /// In pt, this message translates to:
+  /// **'Esta conta não existe.'**
+  String get chatFailedUnknownAccount;
+
+  /// Falha de envio: este aparelho não tem conta.
+  ///
+  /// In pt, this message translates to:
+  /// **'Termine o cadastro para enviar mensagens.'**
+  String get chatFailedNoAccount;
+
+  /// Falha de envio por outro motivo.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível enviar.'**
+  String get chatFailedOther;
+
+  /// Aviso acima da mensagem em que a chave do contato mudou.
+  ///
+  /// In pt, this message translates to:
+  /// **'O código de segurança desta conversa mudou.'**
+  String get chatIdentityChanged;
 }
 
 class _AppLocalizationsDelegate

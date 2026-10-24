@@ -157,5 +157,133 @@
   "waiting": "Aguarde…",
   "@waiting": {
     "description": "Leitor de tela: botão esperando a resposta do servidor."
+  },
+  "chatNew": "Nova conversa",
+  "@chatNew": {
+    "description": "Botão na lista de conversas e título do diálogo."
+  },
+  "chatNewMessage": "Digite o ID da conta da pessoa. Convite por link, QR e nome de usuário vêm em breve.",
+  "@chatNewMessage": {
+    "description": "Explicação no diálogo de nova conversa."
+  },
+  "chatNewLabel": "ID da conta",
+  "@chatNewLabel": {
+    "description": "Campo do diálogo de nova conversa."
+  },
+  "chatNewInvalid": "Isso não é um ID de conta.",
+  "@chatNewInvalid": {
+    "description": "O texto digitado não é um UUID."
+  },
+  "chatNewOpen": "Conversar",
+  "@chatNewOpen": {
+    "description": "Confirma o diálogo de nova conversa."
+  },
+  "cancel": "Cancelar",
+  "@cancel": {
+    "description": "Fecha um diálogo sem fazer nada."
+  },
+  "chatContact": "Contato {id}",
+  "@chatContact": {
+    "description": "Nome de um contato sem perfil ainda; {id} é o começo do ID da conta.",
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "chatYou": "Você",
+  "@chatYou": {
+    "description": "Quem mandou, nas mensagens enviadas (leitor de tela)."
+  },
+  "chatPreviewOutgoing": "Você: {text}",
+  "@chatPreviewOutgoing": {
+    "description": "Prévia na lista quando a última mensagem é sua.",
+    "placeholders": {
+      "text": {
+        "type": "String"
+      }
+    }
+  },
+  "chatTyping": "digitando…",
+  "@chatTyping": {
+    "description": "Na lista de conversas, no lugar da prévia, enquanto o contato digita."
+  },
+  "chatTypingName": "{name} está digitando…",
+  "@chatTypingName": {
+    "description": "Indicador na tela de chat.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "chatUnread": "{count, plural, one{{count} mensagem não lida} other{{count} mensagens não lidas}}",
+  "@chatUnread": {
+    "description": "Leitor de tela para o contador de não lidas.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "chatEmpty": "Nenhuma mensagem ainda. Só você e quem recebe podem ler.",
+  "@chatEmpty": {
+    "description": "Tela de chat sem mensagens."
+  },
+  "chatLoadingOlder": "Carregando mensagens anteriores…",
+  "@chatLoadingOlder": {
+    "description": "Ao rolar até o início da janela de mensagens."
+  },
+  "chatComposerHint": "Mensagem",
+  "@chatComposerHint": {
+    "description": "Campo de texto da tela de chat."
+  },
+  "chatSend": "Enviar",
+  "@chatSend": {
+    "description": "Botão de enviar."
+  },
+  "chatStatusPending": "Enviando",
+  "@chatStatusPending": {
+    "description": "Recibo: na fila, ainda não chegou ao servidor."
+  },
+  "chatStatusSent": "Enviada",
+  "@chatStatusSent": {
+    "description": "Recibo: o servidor gravou na fila do destinatário."
+  },
+  "chatStatusDelivered": "Entregue",
+  "@chatStatusDelivered": {
+    "description": "Recibo: o aparelho do contato recebeu."
+  },
+  "chatStatusRead": "Lida",
+  "@chatStatusRead": {
+    "description": "Recibo: o contato leu."
+  },
+  "chatStatusFailed": "Não foi enviada",
+  "@chatStatusFailed": {
+    "description": "Recibo: o envio falhou de vez."
+  },
+  "chatFailedNoSession": "Ainda não há uma conversa segura com esta pessoa.",
+  "@chatFailedNoSession": {
+    "description": "Falha de envio: sem sessão com o contato."
+  },
+  "chatFailedIdentity": "O código de segurança mudou. Confira antes de enviar.",
+  "@chatFailedIdentity": {
+    "description": "Falha de envio: identidade do contato não confiável."
+  },
+  "chatFailedUnknownAccount": "Esta conta não existe.",
+  "@chatFailedUnknownAccount": {
+    "description": "Falha de envio: destinatário inexistente."
+  },
+  "chatFailedNoAccount": "Termine o cadastro para enviar mensagens.",
+  "@chatFailedNoAccount": {
+    "description": "Falha de envio: este aparelho não tem conta."
+  },
+  "chatFailedOther": "Não foi possível enviar.",
+  "@chatFailedOther": {
+    "description": "Falha de envio por outro motivo."
+  },
+  "chatIdentityChanged": "O código de segurança desta conversa mudou.",
+  "@chatIdentityChanged": {
+    "description": "Aviso acima da mensagem em que a chave do contato mudou."
   }
 }

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:async_redux/async_redux.dart';
 import 'package:falaai_core/falaai_core.dart';
 import 'package:flutter/widgets.dart';
@@ -5,6 +7,8 @@ import 'package:flutter/widgets.dart';
 import '../account/account_store.dart';
 import '../account/accounts_api.dart';
 import '../account/registration.dart';
+import '../chat/chat_store.dart';
+import '../chat/typing.dart';
 import '../core/database_key.dart';
 import 'app_state.dart';
 
@@ -12,14 +16,20 @@ import 'app_state.dart';
 class Dependencies {
   /// [accounts] cria o cliente do `accounts` no primeiro uso: a URL vem da configuração da
   /// build, lida só depois do primeiro frame. [now] é o relógio; os testes injetam outro.
+  /// [chat] guarda as conversas (em memória por enquanto) e [typing] leva os avisos de
+  /// digitação (sem transporte por enquanto).
   Dependencies({
     required this.openCore,
     required SecretStore secrets,
     required AccountsApi Function() accounts,
     DateTime Function()? now,
+    ChatStore? chat,
+    TypingSignals? typing,
   }) : account = AccountStore(secrets),
        _accounts = accounts,
-       now = now ?? DateTime.now;
+       now = now ?? DateTime.now,
+       chat = chat ?? MemoryChatStore(),
+       typing = typing ?? const NoTypingSignals();
 
   /// Abre o falaai-core sobre o banco local do aparelho.
   final Future<FalaaiCore> Function() openCore;
@@ -40,6 +50,32 @@ class Dependencies {
   /// Handle do core depois de [OpenCoreAction]. Fica fora do [AppState]: é um recurso nativo,
   /// não estado da UI.
   FalaaiCore? core;
+
+  /// Conversas e mensagens, por página.
+  final ChatStore chat;
+
+  /// Avisos de digitação.
+  final TypingSignals typing;
+
+  /// Assinaturas dos eventos do core e dos avisos de digitação, vivas enquanto o app roda.
+  StreamSubscription<ChatEvent>? coreEvents;
+  StreamSubscription<TypingEvent>? typingEvents;
+
+  /// Por conversa, o timer que apaga o indicador de digitação do contato.
+  final typingTimers = <String, Timer>{};
+
+  /// Quando o último aviso de digitação deste usuário saiu; `null` depois de "parou".
+  DateTime? typingSentAt;
+
+  /// Cancela assinaturas e timers (testes e encerramento).
+  Future<void> dispose() async {
+    await coreEvents?.cancel();
+    await typingEvents?.cancel();
+    for (final timer in typingTimers.values) {
+      timer.cancel();
+    }
+    typingTimers.clear();
+  }
 }
 
 /// Store do app com o estado inicial.

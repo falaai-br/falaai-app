@@ -18,11 +18,12 @@ make help    # lista os alvos
 | `lib/state/` | Async Redux: `AppState`, actions e as dependências injetadas na store |
 | `lib/account/` | Cadastro: celular, chamadas HTTP ao `accounts` (registro, bundle, PIN) e a conta guardada no aparelho |
 | `lib/core/` | Abertura do falaai-core, a chave do banco, o certificado de remetente (Keychain/Keystore) e o envio/recebimento pelo transporte do core |
+| `lib/chat/` | Mensagens e conversas como a UI as lê: modelo, `ChatStore` paginado por cursor e os avisos de digitação |
 | `lib/config/` | Configuração do ambiente embutida na build |
 | `config/` | Um JSON por ambiente, lido por `--dart-define-from-file` |
 | `lib/router.dart` | Rotas (`go_router`) |
 | `lib/l10n/` | Textos em ARB (pt-BR); o código gerado é versionado |
-| `lib/ui/` | Telas |
+| `lib/ui/` | Telas; `lib/ui/chat/` tem a tela de chat, as bolhas e o diálogo de nova conversa |
 | `tool/build_core.dart` | Build Android do falaai-core, chamado pelo Gradle |
 | `tool/dev_trust_root.dart` | Trust root do signer de dev desta máquina (`make dev-trust-root`) |
 
@@ -64,6 +65,16 @@ Três telas, sem senha: celular, código do SMS e nome; no fim o app oferece o P
 O registro é do Dart, como combinado com o core: `POST /v1/accounts` com o celular em E.164 e o código, `generateAccountKeys` e `setLocalAddress` no core, `PUT /v1/keys` com a parte pública das chaves (`lib/account/registration.dart`). Só depois do bundle publicado as credenciais (ACI, device id e token) vão para o Keychain/Keystore e o aparelho conta como registrado. O nome do perfil e o estado do PIN ficam no mesmo lugar; o PIN em si nunca é guardado. `FALAAI_ACCOUNTS_URL` precisa de `https://` (`http://` só no loopback).
 
 Em dev o servidor não manda SMS: o código é o `FALAAI_DEV_OTP` do compose do falaai-server (`123456`). O PIN vai para `PUT /v1/accounts/me/registration-lock`, contrato proposto ao fls-163; enquanto o servidor não tiver a rota, a tela explica que não deu e deixa adiar.
+
+### Conversas
+
+A lista de conversas é a tela inicial; cada conversa é a conta de um contato (`/chat/<aci>`, também o deep link `falaai://chat/<aci>`). Enquanto não há perfis nem convite por link, QR ou nome de usuário (fla-wyh), "Nova conversa" pede o ID da conta.
+
+O fluxo segue o blueprint: `ChatEvent` do core → action → reducer puro → `StoreConnector`. Ao abrir o core, `StartChatAction` assina `events()` (antes de conectar, para o core confirmar as entregas) e traz do banco do core, por cursor (`receivedMessages`), as mensagens que chegaram com o app fechado. A tela de chat mostra só uma janela de mensagens (`messagePageSize`); rolar até o início pede a página anterior ao `ChatStore` com o id da primeira como cursor. A conversa inteira nunca fica em memória.
+
+Enviar põe o texto na outbox do core (`sendMessage`), que funciona sem conexão e sobrevive a fechar o app; a mensagem aparece como "Enviando" e passa a "Enviada" com `MessageSent` ou a "Não foi enviada", com o motivo, com `MessageFailed`. "Entregue" e "Lida" já estão no modelo e na UI, à espera dos recibos no core. Os avisos de digitação passam por `TypingSignals`; o relay do gateway ainda não existe, então em produção não saem nem chegam, e a UI (indicador e prévia "digitando…") está pronta.
+
+O `ChatStore` é a fronteira com o armazenamento. Enquanto o core não expõe conversas, mensagens por conversa e o histórico de enviadas, a implementação é a `MemoryChatStore`: as recebidas voltam do core a cada abertura; as enviadas ainda não sobrevivem ao reinício. Trocar a implementação não muda as actions nem a UI.
 
 Não há CI remoto (ADR-0009): o pipeline roda nos git hooks e no Refinery do Gas Town.
 

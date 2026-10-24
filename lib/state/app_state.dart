@@ -1,8 +1,11 @@
+import 'package:falaai_core/falaai_core.dart';
 import 'package:flutter/foundation.dart';
 
 import '../account/pin.dart';
+import '../chat/message.dart';
 
 export '../account/pin.dart' show PinStatus;
+export '../chat/message.dart';
 
 /// Estado do falaai-core no aparelho.
 enum CoreStatus {
@@ -117,6 +120,83 @@ class OnboardingState {
   int get hashCode => Object.hash(phone, error);
 }
 
+/// A conversa aberta na tela de chat: só a janela de mensagens carregada, da mais antiga à
+/// mais nova. Rolar para cima traz mais uma página; a conversa inteira nunca fica em memória.
+@immutable
+class OpenConversation {
+  const OpenConversation({
+    required this.peer,
+    this.messages = const [],
+    this.hasOlder = false,
+  });
+
+  final DeviceAddress peer;
+  final List<Message> messages;
+
+  /// Há mensagens antes da primeira da janela.
+  final bool hasOlder;
+
+  String get id => peer.aci;
+
+  OpenConversation copyWith({List<Message>? messages, bool? hasOlder}) =>
+      OpenConversation(
+        peer: peer,
+        messages: messages ?? this.messages,
+        hasOlder: hasOlder ?? this.hasOlder,
+      );
+
+  @override
+  bool operator ==(Object other) =>
+      other is OpenConversation &&
+      other.peer == peer &&
+      listEquals(other.messages, messages) &&
+      other.hasOlder == hasOlder;
+
+  @override
+  int get hashCode => Object.hash(peer, Object.hashAll(messages), hasOlder);
+}
+
+/// Conversas e a tela de chat.
+@immutable
+class ChatState {
+  const ChatState({
+    this.conversations = const [],
+    this.open,
+    this.typing = const {},
+  });
+
+  /// Lista de conversas, da mais recente à mais antiga.
+  final List<ConversationSummary> conversations;
+
+  /// A conversa na tela de chat; `null` fora dela.
+  final OpenConversation? open;
+
+  /// Conversas (pelo id) cujo contato está digitando agora.
+  final Set<String> typing;
+
+  /// [open] aceita `null` (nenhuma conversa aberta).
+  ChatState copyWith({
+    List<ConversationSummary>? conversations,
+    OpenConversation? Function()? open,
+    Set<String>? typing,
+  }) => ChatState(
+    conversations: conversations ?? this.conversations,
+    open: open != null ? open() : this.open,
+    typing: typing ?? this.typing,
+  );
+
+  @override
+  bool operator ==(Object other) =>
+      other is ChatState &&
+      listEquals(other.conversations, conversations) &&
+      other.open == open &&
+      setEquals(other.typing, typing);
+
+  @override
+  int get hashCode =>
+      Object.hash(Object.hashAll(conversations), open, Object.hashAll(typing));
+}
+
 /// Estado único do app (Async Redux). Imutável: os reducers devolvem cópias.
 @immutable
 class AppState {
@@ -124,20 +204,24 @@ class AppState {
     this.core = CoreStatus.starting,
     this.account = const AccountState(),
     this.onboarding = const OnboardingState(),
+    this.chat = const ChatState(),
   });
 
   final CoreStatus core;
   final AccountState account;
   final OnboardingState onboarding;
+  final ChatState chat;
 
   AppState copyWith({
     CoreStatus? core,
     AccountState? account,
     OnboardingState? onboarding,
+    ChatState? chat,
   }) => AppState(
     core: core ?? this.core,
     account: account ?? this.account,
     onboarding: onboarding ?? this.onboarding,
+    chat: chat ?? this.chat,
   );
 
   @override
@@ -145,8 +229,9 @@ class AppState {
       other is AppState &&
       other.core == core &&
       other.account == account &&
-      other.onboarding == onboarding;
+      other.onboarding == onboarding &&
+      other.chat == chat;
 
   @override
-  int get hashCode => Object.hash(core, account, onboarding);
+  int get hashCode => Object.hash(core, account, onboarding, chat);
 }

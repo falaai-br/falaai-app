@@ -133,8 +133,10 @@ void main() {
 
   test('incoming entrega as mensagens que o core decifrou', () async {
     final received = ChatEvent.messageReceived(
+      id: 1,
       from: peer,
       body: Uint8List.fromList(utf8.encode('olá')),
+      identityChanged: false,
     );
 
     final next = messenger.incoming().first;

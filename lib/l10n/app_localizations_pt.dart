@@ -127,4 +127,104 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get waiting => 'Aguarde…';
+
+  @override
+  String get chatNew => 'Nova conversa';
+
+  @override
+  String get chatNewMessage =>
+      'Digite o ID da conta da pessoa. Convite por link, QR e nome de usuário vêm em breve.';
+
+  @override
+  String get chatNewLabel => 'ID da conta';
+
+  @override
+  String get chatNewInvalid => 'Isso não é um ID de conta.';
+
+  @override
+  String get chatNewOpen => 'Conversar';
+
+  @override
+  String get cancel => 'Cancelar';
+
+  @override
+  String chatContact(String id) {
+    return 'Contato $id';
+  }
+
+  @override
+  String get chatYou => 'Você';
+
+  @override
+  String chatPreviewOutgoing(String text) {
+    return 'Você: $text';
+  }
+
+  @override
+  String get chatTyping => 'digitando…';
+
+  @override
+  String chatTypingName(String name) {
+    return '$name está digitando…';
+  }
+
+  @override
+  String chatUnread(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count mensagens não lidas',
+      one: '$count mensagem não lida',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get chatEmpty =>
+      'Nenhuma mensagem ainda. Só você e quem recebe podem ler.';
+
+  @override
+  String get chatLoadingOlder => 'Carregando mensagens anteriores…';
+
+  @override
+  String get chatComposerHint => 'Mensagem';
+
+  @override
+  String get chatSend => 'Enviar';
+
+  @override
+  String get chatStatusPending => 'Enviando';
+
+  @override
+  String get chatStatusSent => 'Enviada';
+
+  @override
+  String get chatStatusDelivered => 'Entregue';
+
+  @override
+  String get chatStatusRead => 'Lida';
+
+  @override
+  String get chatStatusFailed => 'Não foi enviada';
+
+  @override
+  String get chatFailedNoSession =>
+      'Ainda não há uma conversa segura com esta pessoa.';
+
+  @override
+  String get chatFailedIdentity =>
+      'O código de segurança mudou. Confira antes de enviar.';
+
+  @override
+  String get chatFailedUnknownAccount => 'Esta conta não existe.';
+
+  @override
+  String get chatFailedNoAccount => 'Termine o cadastro para enviar mensagens.';
+
+  @override
+  String get chatFailedOther => 'Não foi possível enviar.';
+
+  @override
+  String get chatIdentityChanged =>
+      'O código de segurança desta conversa mudou.';
 }

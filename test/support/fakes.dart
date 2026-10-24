@@ -1,7 +1,10 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:falaai_app/account/accounts_api.dart';
+import 'package:falaai_app/chat/chat_store.dart';
+import 'package:falaai_app/chat/typing.dart';
 import 'package:falaai_app/core/database_key.dart';
 import 'package:falaai_app/state/actions.dart';
 import 'package:falaai_core/falaai_core.dart';
@@ -30,6 +33,36 @@ class RecordingCore extends FakeCore {
   var generatedKeys = 0;
   final keyErrors = <CoreError>[];
   DeviceAddress? localAddress;
+
+  /// Outbox: o que entrou por [sendMessage], com ids 1, 2, 3… repetidos em 16 bytes.
+  final outbox = <({DeviceAddress peer, List<int> body, Uint8List id})>[];
+  final outboxErrors = <CoreError>[];
+
+  /// Recebidas gravadas no banco do core, que [receivedMessages] serve por cursor.
+  final stored = <ReceivedMessage>[];
+  final receivedQueries = <({int after, int limit})>[];
+
+  @override
+  Future<Uint8List> sendMessage({
+    required DeviceAddress peer,
+    required List<int> body,
+  }) async {
+    calls.add('sendMessage');
+    if (outboxErrors.isNotEmpty) throw outboxErrors.removeAt(0);
+    final id = Uint8List(16)..fillRange(0, 16, outbox.length + 1);
+    outbox.add((peer: peer, body: List.of(body), id: id));
+    return id;
+  }
+
+  @override
+  Future<List<ReceivedMessage>> receivedMessages({
+    required int after,
+    required int limit,
+  }) async {
+    calls.add('receivedMessages');
+    receivedQueries.add((after: after, limit: limit));
+    return stored.where((message) => message.id > after).take(limit).toList();
+  }
 
   @override
   Future<AccountKeys> generateAccountKeys() async {
@@ -213,6 +246,21 @@ class FakeAccountsApi implements AccountsApi {
   }
 }
 
+/// [TypingSignals] em memória: guarda o que saiu e entrega o que entra em [events].
+class FakeTypingSignals implements TypingSignals {
+  final sent = <({DeviceAddress peer, bool typing})>[];
+
+  // ignore: close_sinks
+  final events = StreamController<TypingEvent>.broadcast();
+
+  @override
+  Stream<TypingEvent> incoming() => events.stream;
+
+  @override
+  Future<void> send(DeviceAddress peer, {required bool typing}) async =>
+      sent.add((peer: peer, typing: typing));
+}
+
 /// Dependências da store para testes, com tudo em memória. [openCore] padrão abre um
 /// [RecordingCore] novo.
 Dependencies testDependencies({
@@ -220,9 +268,34 @@ Dependencies testDependencies({
   MemorySecretStore? secrets,
   AccountsApi? accounts,
   DateTime Function()? now,
+  ChatStore? chat,
+  TypingSignals? typing,
 }) => Dependencies(
   openCore: openCore ?? () async => RecordingCore(),
   secrets: secrets ?? MemorySecretStore(),
   accounts: () => accounts ?? FakeAccountsApi(),
   now: now,
+  chat: chat,
+  typing: typing,
+);
+
+/// Dispositivo de um contato.
+const testPeer = DeviceAddress(
+  aci: '1b4e28ba-2fa1-11d2-883f-0016d3cca427',
+  deviceId: 1,
+);
+
+/// Mensagem recebida como o core a grava.
+ReceivedMessage receivedFrom(
+  DeviceAddress from,
+  int id,
+  String text, {
+  int serverTimestamp = 1793782800000,
+  bool identityChanged = false,
+}) => ReceivedMessage(
+  id: id,
+  from: from,
+  serverTimestamp: BigInt.from(serverTimestamp),
+  body: Uint8List.fromList(utf8.encode(text)),
+  identityChanged: identityChanged,
 );

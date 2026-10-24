@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
 
 import 'state/app_state.dart';
+import 'ui/chat/chat_screen.dart';
 import 'ui/home_screen.dart';
 import 'ui/onboarding/code_screen.dart';
 import 'ui/onboarding/name_screen.dart';
@@ -19,6 +20,10 @@ abstract final class Routes {
   static const code = '$onboarding/code';
   static const name = '$onboarding/name';
   static const pin = '$onboarding/pin';
+  static const chat = '/chat';
+
+  /// Tela de chat com a conta [aci]; também o deep link `falaai://chat/<aci>`.
+  static String chatWith(String aci) => '$chat/$aci';
 }
 
 /// Rotas do app. O passo do onboarding sai do estado ([redirectFor]): cada action que avança o
@@ -32,6 +37,11 @@ GoRouter createRouter(Store<AppState> store, Listenable refresh) => GoRouter(
     GoRoute(path: Routes.code, builder: (_, _) => const CodeScreen()),
     GoRoute(path: Routes.name, builder: (_, _) => const NameScreen()),
     GoRoute(path: Routes.pin, builder: (_, _) => const PinScreen()),
+    GoRoute(
+      path: '${Routes.chat}/:aci',
+      builder: (_, state) =>
+          ChatScreen(conversationId: state.pathParameters['aci']!),
+    ),
   ],
 );
 

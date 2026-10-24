@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:falaai_core/falaai_core.dart';
@@ -10,6 +11,7 @@ import 'config/build_config.dart';
 import 'core/database_key.dart';
 import 'core/open_core.dart';
 import 'state/actions.dart';
+import 'state/chat_actions.dart';
 import 'state/onboarding_actions.dart';
 
 void main() {
@@ -25,8 +27,12 @@ void main() {
     ),
   );
   // O core abre depois do primeiro frame; a UI mostra o progresso pelo estado. A conta
-  // guardada decide se o app abre no cadastro.
-  store.dispatch(OpenCoreAction());
+  // guardada decide se o app abre no cadastro. Com o core aberto, as conversas carregam.
+  unawaited(
+    store
+        .dispatchAndWait(OpenCoreAction())
+        .then((_) => store.dispatch(StartChatAction())),
+  );
   store.dispatch(LoadAccountAction());
   runApp(FalaAiApp(store: store));
 }

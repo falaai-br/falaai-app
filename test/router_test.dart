@@ -94,10 +94,35 @@ void main() {
       Routes.home,
       null,
     ),
+    (
+      'tudo pronto, no chat: fica',
+      AppState(
+        account: AccountState(
+          status: AccountStatus.registered,
+          profileName: 'Ana',
+          pin: PinStatus.set,
+        ),
+      ),
+      '/chat/1b4e28ba-2fa1-11d2-883f-0016d3cca427',
+      null,
+    ),
+    (
+      'sem registro, deep link do chat: número',
+      AppState(account: unregistered),
+      '/chat/1b4e28ba-2fa1-11d2-883f-0016d3cca427',
+      Routes.phone,
+    ),
   ];
   for (final (name, appState, location, expected) in cases) {
     test(name, () => expect(redirectFor(appState, location), expected));
   }
+
+  test('chatWith monta o caminho do chat', () {
+    expect(
+      Routes.chatWith('1b4e28ba-2fa1-11d2-883f-0016d3cca427'),
+      '/chat/1b4e28ba-2fa1-11d2-883f-0016d3cca427',
+    );
+  });
 
   test('número à espera do código: código', () {
     expect(
