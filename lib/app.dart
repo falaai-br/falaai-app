@@ -18,11 +18,13 @@ class FalaAiApp extends StatefulWidget {
 }
 
 class _FalaAiAppState extends State<FalaAiApp> {
-  late final GoRouter _router = createRouter();
+  late final _refresh = OnboardingRefresh(widget.store);
+  late final GoRouter _router = createRouter(widget.store, _refresh);
 
   @override
   void dispose() {
     _router.dispose();
+    _refresh.dispose();
     super.dispose();
   }
 

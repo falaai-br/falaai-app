@@ -6,14 +6,14 @@ import '../support/fakes.dart';
 
 void main() {
   test('o estado começa com o core abrindo', () {
-    final store = createStore(Dependencies(openCore: () async => FakeCore()));
+    final store = createStore(testDependencies());
 
     expect(store.state.core, CoreStatus.starting);
   });
 
   test('core aberto: estado pronto e handle nas dependências', () async {
     final core = FakeCore();
-    final deps = Dependencies(openCore: () async => core);
+    final deps = testDependencies(openCore: () async => core);
     final store = createStore(deps);
 
     await store.dispatchAndWait(OpenCoreAction());
@@ -23,7 +23,7 @@ void main() {
   });
 
   test('falha ao abrir: estado de erro e sem handle', () async {
-    final deps = Dependencies(
+    final deps = testDependencies(
       openCore: () async => throw StateError('chave errada'),
     );
     final store = createStore(deps);

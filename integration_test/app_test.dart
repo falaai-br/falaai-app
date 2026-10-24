@@ -6,6 +6,7 @@ import 'package:falaai_app/app.dart';
 import 'package:falaai_app/core/open_core.dart';
 import 'package:falaai_app/state/actions.dart';
 import 'package:falaai_app/state/app_state.dart';
+import 'package:falaai_app/state/onboarding_actions.dart';
 import 'package:falaai_core/falaai_core.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
@@ -27,18 +28,46 @@ void main() {
     trustRoot: testTrustRoot,
   );
 
-  testWidgets('o app abre o core nativo e mostra a lista vazia', (
+  testWidgets('o app abre o core nativo e, sem registro, o cadastro', (
     tester,
   ) async {
     final secrets = MemorySecretStore();
-    final store = createStore(Dependencies(openCore: () => open(secrets)));
+    final store = createStore(
+      testDependencies(openCore: () => open(secrets), secrets: secrets),
+    );
     store.dispatch(OpenCoreAction());
+    store.dispatch(LoadAccountAction());
     await tester.pumpWidget(FalaAiApp(store: store));
 
     await tester.pumpAndSettle();
 
     expect(store.state.core, CoreStatus.ready);
-    expect(find.text('Nenhuma conversa ainda.'), findsOneWidget);
+    expect(find.text('Qual é o seu celular?'), findsOneWidget);
+  });
+
+  testWidgets('o cadastro registra com as chaves do core nativo', (
+    tester,
+  ) async {
+    final secrets = MemorySecretStore();
+    final accounts = FakeAccountsApi();
+    final store = createStore(
+      testDependencies(
+        openCore: () => open(secrets),
+        secrets: secrets,
+        accounts: accounts,
+      ),
+    );
+    await store.dispatchAndWait(OpenCoreAction());
+    await store.dispatchAndWait(LoadAccountAction());
+
+    store.dispatch(SubmitPhoneAction('11 91234-5678'));
+    await store.dispatchAndWait(VerifyCodeAction('123456'));
+
+    expect(store.state.account.status, AccountStatus.registered);
+    final keys = accounts.uploads.single.keys;
+    expect(keys.identityKey, isNotEmpty);
+    expect(keys.preKeys, isNotEmpty);
+    expect(keys.kyberPreKeys, isNotEmpty);
   });
 
   testWidgets('o core gera as chaves da conta e reabre o banco cifrado', (

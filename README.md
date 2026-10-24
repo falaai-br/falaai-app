@@ -16,6 +16,7 @@ make help    # lista os alvos
 | Caminho | O que tem |
 |---|---|
 | `lib/state/` | Async Redux: `AppState`, actions e as dependências injetadas na store |
+| `lib/account/` | Cadastro: celular, chamadas HTTP ao `accounts` (registro, bundle, PIN) e a conta guardada no aparelho |
 | `lib/core/` | Abertura do falaai-core, a chave do banco, o certificado de remetente (Keychain/Keystore) e o envio/recebimento pelo transporte do core |
 | `lib/config/` | Configuração do ambiente embutida na build |
 | `config/` | Um JSON por ambiente, lido por `--dart-define-from-file` |
@@ -54,7 +55,15 @@ adb reverse tcp:8080 tcp:8080   # Android: o 127.0.0.1 do aparelho chega ao serv
 
 O certificado de remetente (24h) fica no Keychain/Keystore e volta ao core a cada abertura; quando o core diz que falta ou venceu, o app pede outro ao `accounts` pelo core e cifra de novo (`lib/core/sender_certificate.dart`).
 
-Envio e recebimento passam pelo transporte do core (`lib/core/messenger.dart`); o Dart não abre socket nem HTTPS. Depois do registro, `Messenger.onRegistered` conecta com o token do dispositivo e pede o primeiro certificado. `seal` cifra e sela; `deliver` envia, e reenviar o mesmo resultado deixa o destinatário deduplicar. O core vai pelo socket não autenticado com a unidentified access key quando tem a profile key do contato e cai para o autenticado sem ela. O que chega sai decifrado em `incoming`.
+Envio e recebimento passam pelo transporte do core (`lib/core/messenger.dart`); para mensagens, o Dart não abre socket nem HTTPS. Depois do registro, `Messenger.onRegistered` conecta com o token do dispositivo e pede o primeiro certificado. `seal` cifra e sela; `deliver` envia, e reenviar o mesmo resultado deixa o destinatário deduplicar. O core vai pelo socket não autenticado com a unidentified access key quando tem a profile key do contato e cai para o autenticado sem ela. O que chega sai decifrado em `incoming`.
+
+### Cadastro
+
+Três telas, sem senha: celular, código do SMS e nome; no fim o app oferece o PIN de registro, que pode ser adiado (o lembrete aparece na lista de conversas um dia depois). O passo atual sai do estado (`redirectFor` em `lib/router.dart`).
+
+O registro é do Dart, como combinado com o core: `POST /v1/accounts` com o celular em E.164 e o código, `generateAccountKeys` e `setLocalAddress` no core, `PUT /v1/keys` com a parte pública das chaves (`lib/account/registration.dart`). Só depois do bundle publicado as credenciais (ACI, device id e token) vão para o Keychain/Keystore e o aparelho conta como registrado. O nome do perfil e o estado do PIN ficam no mesmo lugar; o PIN em si nunca é guardado. `FALAAI_ACCOUNTS_URL` precisa de `https://` (`http://` só no loopback).
+
+Em dev o servidor não manda SMS: o código é o `FALAAI_DEV_OTP` do compose do falaai-server (`123456`). O PIN vai para `PUT /v1/accounts/me/registration-lock`, contrato proposto ao fls-163; enquanto o servidor não tiver a rota, a tela explica que não deu e deixa adiar.
 
 Não há CI remoto (ADR-0009): o pipeline roda nos git hooks e no Refinery do Gas Town.
 

@@ -15,5 +15,147 @@
   "homeEmpty": "Nenhuma conversa ainda.",
   "@homeEmpty": {
     "description": "Lista de conversas vazia."
+  },
+  "onboardingPrivacy": "Só você e quem recebe podem ler suas mensagens.",
+  "@onboardingPrivacy": {
+    "description": "Rodapé da primeira tela do cadastro. Fala de privacidade sem jargão de criptografia."
+  },
+  "phoneTitle": "Qual é o seu celular?",
+  "@phoneTitle": {
+    "description": "Título da tela do número, primeira do cadastro."
+  },
+  "phoneMessage": "Vamos enviar um código por SMS para confirmar que o número é seu.",
+  "@phoneMessage": {
+    "description": "Explicação da tela do número."
+  },
+  "phoneLabel": "Celular com DDD",
+  "@phoneLabel": {
+    "description": "Rótulo do campo do número."
+  },
+  "phoneHint": "(11) 91234-5678",
+  "@phoneHint": {
+    "description": "Exemplo no campo do número."
+  },
+  "phoneInvalid": "Digite um celular do Brasil com DDD.",
+  "@phoneInvalid": {
+    "description": "O número digitado não é um celular brasileiro, ou o servidor o recusou."
+  },
+  "continueButton": "Continuar",
+  "@continueButton": {
+    "description": "Botão que avança no cadastro."
+  },
+  "codeTitle": "Digite o código",
+  "@codeTitle": {
+    "description": "Título da tela do código do SMS."
+  },
+  "codeMessage": "Enviamos um código por SMS para {phone}.",
+  "@codeMessage": {
+    "description": "Explicação da tela do código.",
+    "placeholders": {
+      "phone": {
+        "type": "String",
+        "example": "(11) 91234-5678"
+      }
+    }
+  },
+  "codeLabel": "Código de {length} dígitos",
+  "@codeLabel": {
+    "description": "Rótulo do campo do código do SMS.",
+    "placeholders": {
+      "length": {
+        "type": "int",
+        "example": "6"
+      }
+    }
+  },
+  "codeConfirm": "Confirmar",
+  "@codeConfirm": {
+    "description": "Botão que confere o código e registra o aparelho."
+  },
+  "codeEditPhone": "Mudar número",
+  "@codeEditPhone": {
+    "description": "Volta para a tela do número."
+  },
+  "codeInvalid": "Código incorreto. Confira o SMS e tente de novo.",
+  "@codeInvalid": {
+    "description": "O servidor recusou o código."
+  },
+  "errorRateLimited": "Muitas tentativas. Espere um pouco e tente de novo.",
+  "@errorRateLimited": {
+    "description": "O servidor limitou as tentativas."
+  },
+  "errorNetwork": "Sem conexão com o servidor. Confira sua internet e tente de novo.",
+  "@errorNetwork": {
+    "description": "Falha de rede no cadastro."
+  },
+  "errorUnavailable": "O cadastro está indisponível agora. Tente mais tarde.",
+  "@errorUnavailable": {
+    "description": "O servidor não aceita registros no momento."
+  },
+  "errorFailed": "Algo deu errado neste aparelho. Tente de novo.",
+  "@errorFailed": {
+    "description": "Falha local ou resposta inesperada do servidor."
+  },
+  "nameTitle": "Como você quer ser chamado?",
+  "@nameTitle": {
+    "description": "Título da tela do nome do perfil."
+  },
+  "nameMessage": "Seu nome aparece para as pessoas com quem você conversa.",
+  "@nameMessage": {
+    "description": "Explicação da tela do nome."
+  },
+  "nameLabel": "Seu nome",
+  "@nameLabel": {
+    "description": "Rótulo do campo do nome."
+  },
+  "pinTitle": "Crie um PIN",
+  "@pinTitle": {
+    "description": "Título da tela do PIN de registro."
+  },
+  "pinMessage": "Com o PIN, ninguém registra sua conta em outro aparelho, mesmo que receba o código do SMS.",
+  "@pinMessage": {
+    "description": "Explicação da tela do PIN."
+  },
+  "pinLabel": "PIN (pelo menos {length} números)",
+  "@pinLabel": {
+    "description": "Rótulo do campo do PIN.",
+    "placeholders": {
+      "length": {
+        "type": "int",
+        "example": "4"
+      }
+    }
+  },
+  "pinConfirmLabel": "Repita o PIN",
+  "@pinConfirmLabel": {
+    "description": "Rótulo do campo de confirmação do PIN."
+  },
+  "pinMismatch": "Os PINs não são iguais.",
+  "@pinMismatch": {
+    "description": "A confirmação não bate com o PIN."
+  },
+  "pinCreate": "Criar PIN",
+  "@pinCreate": {
+    "description": "Botão que cria o PIN."
+  },
+  "pinLater": "Agora não",
+  "@pinLater": {
+    "description": "Adia a criação do PIN."
+  },
+  "pinLaterHint": "Se preferir, crie depois. Vamos lembrar você.",
+  "@pinLaterHint": {
+    "description": "Abaixo dos botões da tela do PIN."
+  },
+  "pinUnavailable": "Não foi possível criar o PIN agora. Tente mais tarde.",
+  "@pinUnavailable": {
+    "description": "O servidor não aceitou criar o PIN no momento."
+  },
+  "pinReminder": "Crie um PIN para proteger sua conta.",
+  "@pinReminder": {
+    "description": "Lembrete na lista de conversas depois que o PIN foi adiado."
+  },
+  "waiting": "Aguarde…",
+  "@waiting": {
+    "description": "Leitor de tela: botão esperando a resposta do servidor."
   }
 }

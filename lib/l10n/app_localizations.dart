@@ -117,6 +117,192 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Nenhuma conversa ainda.'**
   String get homeEmpty;
+
+  /// Rodapé da primeira tela do cadastro. Fala de privacidade sem jargão de criptografia.
+  ///
+  /// In pt, this message translates to:
+  /// **'Só você e quem recebe podem ler suas mensagens.'**
+  String get onboardingPrivacy;
+
+  /// Título da tela do número, primeira do cadastro.
+  ///
+  /// In pt, this message translates to:
+  /// **'Qual é o seu celular?'**
+  String get phoneTitle;
+
+  /// Explicação da tela do número.
+  ///
+  /// In pt, this message translates to:
+  /// **'Vamos enviar um código por SMS para confirmar que o número é seu.'**
+  String get phoneMessage;
+
+  /// Rótulo do campo do número.
+  ///
+  /// In pt, this message translates to:
+  /// **'Celular com DDD'**
+  String get phoneLabel;
+
+  /// Exemplo no campo do número.
+  ///
+  /// In pt, this message translates to:
+  /// **'(11) 91234-5678'**
+  String get phoneHint;
+
+  /// O número digitado não é um celular brasileiro, ou o servidor o recusou.
+  ///
+  /// In pt, this message translates to:
+  /// **'Digite um celular do Brasil com DDD.'**
+  String get phoneInvalid;
+
+  /// Botão que avança no cadastro.
+  ///
+  /// In pt, this message translates to:
+  /// **'Continuar'**
+  String get continueButton;
+
+  /// Título da tela do código do SMS.
+  ///
+  /// In pt, this message translates to:
+  /// **'Digite o código'**
+  String get codeTitle;
+
+  /// Explicação da tela do código.
+  ///
+  /// In pt, this message translates to:
+  /// **'Enviamos um código por SMS para {phone}.'**
+  String codeMessage(String phone);
+
+  /// Rótulo do campo do código do SMS.
+  ///
+  /// In pt, this message translates to:
+  /// **'Código de {length} dígitos'**
+  String codeLabel(int length);
+
+  /// Botão que confere o código e registra o aparelho.
+  ///
+  /// In pt, this message translates to:
+  /// **'Confirmar'**
+  String get codeConfirm;
+
+  /// Volta para a tela do número.
+  ///
+  /// In pt, this message translates to:
+  /// **'Mudar número'**
+  String get codeEditPhone;
+
+  /// O servidor recusou o código.
+  ///
+  /// In pt, this message translates to:
+  /// **'Código incorreto. Confira o SMS e tente de novo.'**
+  String get codeInvalid;
+
+  /// O servidor limitou as tentativas.
+  ///
+  /// In pt, this message translates to:
+  /// **'Muitas tentativas. Espere um pouco e tente de novo.'**
+  String get errorRateLimited;
+
+  /// Falha de rede no cadastro.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem conexão com o servidor. Confira sua internet e tente de novo.'**
+  String get errorNetwork;
+
+  /// O servidor não aceita registros no momento.
+  ///
+  /// In pt, this message translates to:
+  /// **'O cadastro está indisponível agora. Tente mais tarde.'**
+  String get errorUnavailable;
+
+  /// Falha local ou resposta inesperada do servidor.
+  ///
+  /// In pt, this message translates to:
+  /// **'Algo deu errado neste aparelho. Tente de novo.'**
+  String get errorFailed;
+
+  /// Título da tela do nome do perfil.
+  ///
+  /// In pt, this message translates to:
+  /// **'Como você quer ser chamado?'**
+  String get nameTitle;
+
+  /// Explicação da tela do nome.
+  ///
+  /// In pt, this message translates to:
+  /// **'Seu nome aparece para as pessoas com quem você conversa.'**
+  String get nameMessage;
+
+  /// Rótulo do campo do nome.
+  ///
+  /// In pt, this message translates to:
+  /// **'Seu nome'**
+  String get nameLabel;
+
+  /// Título da tela do PIN de registro.
+  ///
+  /// In pt, this message translates to:
+  /// **'Crie um PIN'**
+  String get pinTitle;
+
+  /// Explicação da tela do PIN.
+  ///
+  /// In pt, this message translates to:
+  /// **'Com o PIN, ninguém registra sua conta em outro aparelho, mesmo que receba o código do SMS.'**
+  String get pinMessage;
+
+  /// Rótulo do campo do PIN.
+  ///
+  /// In pt, this message translates to:
+  /// **'PIN (pelo menos {length} números)'**
+  String pinLabel(int length);
+
+  /// Rótulo do campo de confirmação do PIN.
+  ///
+  /// In pt, this message translates to:
+  /// **'Repita o PIN'**
+  String get pinConfirmLabel;
+
+  /// A confirmação não bate com o PIN.
+  ///
+  /// In pt, this message translates to:
+  /// **'Os PINs não são iguais.'**
+  String get pinMismatch;
+
+  /// Botão que cria o PIN.
+  ///
+  /// In pt, this message translates to:
+  /// **'Criar PIN'**
+  String get pinCreate;
+
+  /// Adia a criação do PIN.
+  ///
+  /// In pt, this message translates to:
+  /// **'Agora não'**
+  String get pinLater;
+
+  /// Abaixo dos botões da tela do PIN.
+  ///
+  /// In pt, this message translates to:
+  /// **'Se preferir, crie depois. Vamos lembrar você.'**
+  String get pinLaterHint;
+
+  /// O servidor não aceitou criar o PIN no momento.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível criar o PIN agora. Tente mais tarde.'**
+  String get pinUnavailable;
+
+  /// Lembrete na lista de conversas depois que o PIN foi adiado.
+  ///
+  /// In pt, this message translates to:
+  /// **'Crie um PIN para proteger sua conta.'**
+  String get pinReminder;
+
+  /// Leitor de tela: botão esperando a resposta do servidor.
+  ///
+  /// In pt, this message translates to:
+  /// **'Aguarde…'**
+  String get waiting;
 }
 
 class _AppLocalizationsDelegate
